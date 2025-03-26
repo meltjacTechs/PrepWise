@@ -1,6 +1,3 @@
-"use client"
-
-import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { getRandomInterviewCover } from '@/lib/utils';
@@ -9,10 +6,6 @@ import Link from "next/link";
 import DisplayTechIcons from "@/components/DisplayTechIcons";
 
 const InterviewCard = ({ interviewId, userId, role, type, techstack, createdAt }: InterviewCardProps) => {
-    useEffect(() => {
-        console.log(userId); // Temporary workaround to avoid unused variable warnings
-    }, [userId]);
-
     const feedback = null as Feedback | null;
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
     const formatedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format('MMM D, YYYY');
