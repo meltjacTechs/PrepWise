@@ -59,11 +59,13 @@ export async function createFeedback(params: CreateFeedbackParams) {
 
     await feedbackRef.set(feedback);
 
+    console.log("Feedback saved successfully:", feedbackRef.id);
     return { success: true, feedbackId: feedbackRef.id, message: "Feedback created successfully" };
   } catch (error) {
     console.error("Error saving feedback:", error);
     const errorMessage = error instanceof Error ? error.message : "Failed to create feedback";
-    return { success: false, message: errorMessage };
+    console.error("Detailed error:", JSON.stringify(error));
+    return { success: false, feedbackId: null, message: errorMessage };
   }
 }
 

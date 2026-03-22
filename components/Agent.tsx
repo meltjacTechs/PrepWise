@@ -45,9 +45,10 @@ const Agent = ({
     };
 
     const onMessage = (message: Message) => {
-      if (message.type === "transcript" && message.transcriptType === "final") {
+      if (message.type === "transcript") {
         const newMessage = { role: message.role, content: message.transcript };
         setMessages((prev) => [...prev, newMessage]);
+        console.log("Message received:", message.transcriptType, message.transcript);
       }
     };
 
@@ -88,19 +89,35 @@ const Agent = ({
     }
 
     const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-      console.log("handleGenerateFeedback");
+      console.log("handleGenerateFeedback", messages.length, "messages");
+      
+      if (messages.length === 0) {
+        setError("No interview transcript captured. Please try again.");
+        router.push("/");
+        return;
+      }
 
-      const { success, feedbackId: id } = await createFeedback({
-        interviewId: interviewId!,
-        userId: userId!,
-        transcript: messages,
-        feedbackId,
-      });
+      try {
+        const result = await createFeedback({
+          interviewId: interviewId!,
+          userId: userId!,
+          transcript: messages,
+          feedbackId,
+        });
+        
+        console.log("Feedback result:", result);
 
-      if (success && id) {
-        router.push(`/interview/${interviewId}/feedback`);
-      } else {
-        console.log("Error saving feedback");
+        if (result.success && result.feedbackId) {
+          router.push(`/interview/${interviewId}/feedback`);
+        } else {
+          setError(result.message || "Failed to save feedback");
+          console.error("Error saving feedback:", result.message);
+          router.push("/");
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Unknown error";
+        setError(`Error: ${errorMsg}`);
+        console.error("Feedback error:", err);
         router.push("/");
       }
     };
@@ -191,6 +208,13 @@ const Agent = ({
               {lastMessage}
             </p>
           </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
         </div>
       )}
 
