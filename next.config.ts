@@ -6,7 +6,13 @@ const nextConfig: NextConfig = {
     },
     typescript:{
         ignoreBuildErrors: true,
-    }
+    },
+    experimental: {
+        turbopack: {
+            resolveAlias: {},
+        },
+    },
 };
 
 export default nextConfig;
+
