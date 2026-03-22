@@ -72,12 +72,7 @@ export async function signIn(params: SignInParams) {
 
   try {
     const userRecord = await auth.getUserByEmail(email);
-    if (!userRecord)
-      return {
-        success: false,
-        message: "User does not exist. Create an account.",
-      };
-
+    
     await setSessionCookie(idToken);
     
     return {
@@ -86,6 +81,14 @@ export async function signIn(params: SignInParams) {
     };
   } catch (error: any) {
     console.error("Error signing in:", error);
+
+    // Handle user not found error
+    if (error.code === "auth/user-not-found") {
+      return {
+        success: false,
+        message: "User does not exist. Create an account.",
+      };
+    }
 
     return {
       success: false,
